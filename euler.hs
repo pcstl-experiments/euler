@@ -1,6 +1,9 @@
 import qualified Data.Set as Set
 import qualified Data.Map as Map
-import Data.Char (ord)
+import Data.Array (listArray, (!))
+
+isqrt = ceiling . sqrt . fromIntegral
+isqrtDown = floor . sqrt . fromIntegral
 
 primes :: [Integer]
 primes = 2 : 3 : 5 : (filter isPrime [7..])
@@ -45,7 +48,7 @@ smallestEvenlyDivided nums = product commonFactors
 
 reverseNumber :: Integer -> Integer
 reverseNumber n =
-  let digits = reverseDigits n 
+  let digits = reverseDigits n
   in sum $ zipWith (\x y -> x * (10^(y-1))) digits $ countDown (length digits)
   where
     reverseDigits 0    = []
@@ -57,3 +60,24 @@ isPalindrome x = x == reverseNumber x
 
 fastUniqueElements :: Ord a => [a] -> [a]
 fastUniqueElements = Set.toList . Set.fromList
+
+-- Lines in 2D matrices
+selectIndices :: ((Int, Int) -> (Int, Int)) -> Int -> (Int, Int) -> [(Int, Int)]
+selectIndices nextIndex len start = selectIndices' start 0 [start]
+  where selectIndices' currentIndex currentLen acc
+          | currentLen == len - 1 = acc
+          | otherwise
+          = let next = nextIndex currentIndex
+            in selectIndices' next (currentLen + 1) ((nextIndex currentIndex) : acc)
+
+lineVert :: Int -> (Int, Int) -> [(Int, Int)]
+lineVert = selectIndices (\(x, y) -> (x + 1, y))
+
+lineHoriz :: Int -> (Int, Int) -> [(Int, Int)]
+lineHoriz = selectIndices (\(x, y) -> (x, y + 1))
+
+lineDiagRight :: Int -> (Int, Int) -> [(Int, Int)]
+lineDiagRight = selectIndices (\(x, y) -> (x + 1, y + 1))
+
+lineDiagLeft :: Int -> (Int, Int) -> [(Int, Int)]
+lineDiagLeft = selectIndices (\(x, y) -> (x + 1, y - 1))
