@@ -41,6 +41,11 @@ minimalCommonFactors nums =
   let factorCounts = map countedPrimeFactors nums
   in foldr (Map.unionWith max) Map.empty factorCounts
 
+factorCount :: Integer -> Integer
+factorCount num =
+  let primeFactorCounts = Map.elems $ countedPrimeFactors num
+  in product ((+1) <$> ((fromIntegral <$> primeFactorCounts) :: [Integer]))
+
 smallestEvenlyDivided :: [Integer] -> Integer
 smallestEvenlyDivided nums = product commonFactors
   where commonFactors = concatMap (uncurry (flip replicate)) factorList
@@ -81,3 +86,19 @@ lineDiagRight = selectIndices (\(x, y) -> (x + 1, y + 1))
 
 lineDiagLeft :: Int -> (Int, Int) -> [(Int, Int)]
 lineDiagLeft = selectIndices (\(x, y) -> (x + 1, y - 1))
+
+allProducts :: [Integer] -> [Integer]
+allProducts l = fastUniqueElements $ allProducts' l
+  where allProducts' []     = []
+        allProducts' [x]    = [x]
+        allProducts' (n:ns) =
+          let rest = allProducts ns
+          in [n] ++ rest ++ ((n *) <$> rest) 
+
+reverseDigits :: Integer -> [Integer]
+reverseDigits n
+  | n <= 0    = []
+  | otherwise = (n `mod` 10) : (reverseDigits $ n `div` 10)
+
+digits :: Integer -> [Integer]
+digits = reverse . reverseDigits
