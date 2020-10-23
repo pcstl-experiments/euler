@@ -1,5 +1,6 @@
 import qualified Data.Set as Set
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
+import Data.List (foldl', maximumBy)
 import Data.Array (listArray, (!))
 
 isqrt = ceiling . sqrt . fromIntegral
@@ -102,3 +103,11 @@ reverseDigits n
 
 digits :: Integer -> [Integer]
 digits = reverse . reverseDigits
+
+-- TODO: Should use state monad
+memoizeWithMap :: Ord k => (k -> a) -> k -> Map.Map k a -> (a, Map.Map k a)
+memoizeWithMap f x map = case Map.lookup x map of
+  Just result -> (result, map)
+  Nothing ->
+    let result = f x
+    in (result, Map.insert x result map)
